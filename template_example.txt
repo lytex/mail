@@ -1,0 +1,2 @@
+The server has lost connection and gained it at {send_time}
+Uptime: {uptime}
