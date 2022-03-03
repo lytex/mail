@@ -22,6 +22,8 @@ TEMPLATE_PATH = os.getenv("TEMPLATE_PATH")
 SUBJECT = os.getenv("SUBJECT")
 RECIPIENTS = os.getenv("RECIPIENTS")
 SENDER = os.getenv("SENDER")
+COOLDOWN_FILE = os.getenv("COOLDOWN_FILE")
+COOLDOWN_SECS = os.getenv("COOLDOWN_SECS")
 
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
@@ -48,7 +50,24 @@ def main():
 
     service = build("gmail", "v1", credentials=creds)
 
-    sended = False
+    # Do not send if a mail was sent COOLDOWN_SECS seconds before
+    if COOLDOWN_FILE is not None:
+        now = dt.datetime.now()
+        try:
+            with open(COOLDOWN_FILE, "r") as f:
+                then = dt.datetime.strptime(f.read().strip("\r\n"), "%d-%m-%Y %H:%M:%S")
+            if (now - then).total_seconds() > int(COOLDOWN_SECS):
+                print("Cooldown period expired, sending mail...")
+                sended = False
+            else:
+                print(f"Cooldown period ongoing, not sending mail until {COOLDOWN_SECS} secs have passed")
+                sended = True
+        except FileNotFoundError:
+            with open(COOLDOWN_FILE, "w+") as f:
+                f.write(dt.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
+                sended = False
+    else:
+        sended = False
     while not sended:
         if os.system("ping -c 4 gmail.com") == 0:
             send_time = dt.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
