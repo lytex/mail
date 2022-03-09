@@ -58,6 +58,8 @@ def main():
                 then = dt.datetime.strptime(f.read().strip("\r\n"), "%d-%m-%Y %H:%M:%S")
             if (now - then).total_seconds() > int(COOLDOWN_SECS):
                 print("Cooldown period expired, sending mail...")
+                with open(COOLDOWN_FILE, "w+") as f:
+                    f.write(dt.datetime.now().strftime("%d-%m-%Y %H:%M:%S"))
                 sended = False
             else:
                 print(f"Cooldown period ongoing, not sending mail until {COOLDOWN_SECS} secs have passed")
