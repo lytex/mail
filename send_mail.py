@@ -73,7 +73,7 @@ def main():
     while not sended:
         if os.system("ping -c 4 gmail.com") == 0:
             send_time = dt.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-            uptime = subprocess.run("uptime", stdout=subprocess.PIPE).stdout.decode("utf-8")
+            uptime = subprocess.run("uptime", stdout=subprocess.PIPE).stdout.decode("utf-8", errors="replace")
             with open(TEMPLATE_PATH) as template:
                 msg = template.read().format(send_time=send_time, uptime=uptime)
 
@@ -102,7 +102,7 @@ def gather_reporting_info():
     """
 
     send_time = dt.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-    uptime = subprocess.run("uptime", stdout=subprocess.PIPE).stdout.decode("utf-8")
+    uptime = subprocess.run("uptime", stdout=subprocess.PIPE).stdout.decode("utf-8", errors="replace")
     return {
         "send_time": send_time,
         "uptime": uptime,
@@ -126,7 +126,7 @@ def create_message(sender, to, subject, message_text):
     message["from"] = sender
     message["subject"] = subject
     message["Content-Type"] = "text/html; charset=utf-8"
-    test = {"raw": base64.urlsafe_b64encode(message.as_string().encode("utf-8")).decode("utf-8")}
+    test = {"raw": base64.urlsafe_b64encode(message.as_string().encode("utf-8")).decode("utf-8", errors="replace")}
     print("Sending message:")
     print(message.as_string())
     return test
