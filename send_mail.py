@@ -74,8 +74,9 @@ def main():
         if os.system("ping -c 4 gmail.com") == 0:
             send_time = dt.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
             uptime = subprocess.run("uptime", stdout=subprocess.PIPE).stdout.decode("utf-8", errors="replace")
-            with open(TEMPLATE_PATH) as template:
-                msg = template.read().format(send_time=send_time, uptime=uptime)
+            with open(TEMPLATE_PATH, encoding="utf-8", errors="replace") as template:
+                msg = template.read()
+                msg = msg.format(send_time=send_time, uptime=uptime)
 
             message = create_message(
                 SENDER,
